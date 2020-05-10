@@ -25,6 +25,8 @@ namespace Game.GlobalData
 
         public PlayerData playerData = null;
 
+        public CardModel cardModel { get; protected set; }
+
         public void Init()
         {
             if (isInit)
@@ -32,6 +34,11 @@ namespace Game.GlobalData
                 return;
             }
             isInit = true;
+
+            if (cardModel == null)
+            {
+                cardModel = new CardModel();
+            }
 
             playerData = PlayerData.Load();
         }

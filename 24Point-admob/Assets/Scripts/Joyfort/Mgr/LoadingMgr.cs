@@ -119,7 +119,8 @@ public class LoadingMgr : MonoBehaviour
     void Start()
     {
         //InitThridPart();
-        PageMgr.ShowPage<UILevel>();
+        //PageMgr.ShowPage<UILevel>();
+        PageMgr.ShowPage<UILevel2>();
     }
 
     protected void InitPlayerData()

@@ -8,7 +8,7 @@ using UFrame.MiniGame;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UILevel : UIPage
+public class UILevel2 : UIPage
 {
     readonly string TopLeft_Poker_Path = "card_grid/poker_topleft";
     readonly string TopRight_Poker_Path = "card_grid/poker_topright";
@@ -80,22 +80,22 @@ public class UILevel : UIPage
     /// <summary>
     /// 运算中第一个数
     /// </summary>
-    int firstNum = Const.Invalid_Int;
+    //int firstNum = Const.Invalid_Int;
 
     /// <summary>
     /// 运算符
     /// </summary>
-    CalcOper calcOper = CalcOper.None;
+    //CalcOper calcOper = CalcOper.None;
 
     /// <summary>
     /// 运算中第二个数
     /// </summary>
-    int SecondNum = Const.Invalid_Int;
+    //int SecondNum = Const.Invalid_Int;
 
-    /// <summary>
-    /// 是否选定第一个数
-    /// </summary>
-    bool isSelectedFirstNum = false;
+    ///// <summary>
+    ///// 是否选定第一个数
+    ///// </summary>
+    //bool isSelectedFirstNum = false;
 
     int topLeftNum = Const.Invalid_Int;
     int topRightNum = Const.Invalid_Int;
@@ -114,6 +114,11 @@ public class UILevel : UIPage
 
     CardOperator cardOperator = new CardOperator();
 
+    Text    txtFirst;
+    Text    txtOp;
+    Text    txtSecond;
+    Text    txtResult;
+
     PlayerData playerData { get { return GlobalDataManager.GetInstance().playerData; } }
 
     /// <summary>
@@ -121,7 +126,7 @@ public class UILevel : UIPage
     /// </summary>
     bool requestADButUnload = false;
 
-    public UILevel() : base(UIType.PopUp, UIMode.DoNothing, UICollider.None, UITickedMode.Update)
+    public UILevel2() : base(UIType.PopUp, UIMode.DoNothing, UICollider.None, UITickedMode.Update)
     {
         uiPath = "UIPrefab/UILevel";
     }
@@ -134,9 +139,18 @@ public class UILevel : UIPage
 
         GenLevel(true);
 
+        GlobalDataManager.GetInstance().cardModel.txtFirst = this.txtFirst;
+        GlobalDataManager.GetInstance().cardModel.txtOp = this.txtOp;
+        GlobalDataManager.GetInstance().cardModel.txtSecond = this.txtSecond;
+        GlobalDataManager.GetInstance().cardModel.txtResult = this.txtResult;
+
+        MessageManager.GetInstance().Regist((int)GameMessageDefine.GenLevel, OnGenLevel);
+
         MessageManager.GetInstance().Regist((int)GameMessageDefine.RewardADLoadSuccess, OnRewardADLoadSuccess);
 
         MessageManager.GetInstance().Regist((int)GameMessageDefine.RewardADLoadFail, OnRewardADLoadFail);
+
+        
     }
 
     public override void Tick(int deltaTimeMS)
@@ -151,11 +165,6 @@ public class UILevel : UIPage
 
     public void GenLevel(bool isNewLevel)
     {
-        firstNum = Const.Invalid_Int;
-        calcOper = CalcOper.None;
-        SecondNum = Const.Invalid_Int;
-        isSelectedFirstNum = false;
-        leftCalcStepNum = 3;
         txtTips.text = "";
 
         //所有的outline隐藏
@@ -292,6 +301,11 @@ public class UILevel : UIPage
 
         txtLeftNext = RegistCompent<Text>("head/next/text");
         txtLeftNext.text = playerData.leftNumNextPoker.ToString();
+
+        txtFirst = RegistCompent<Text>("Txt_first");
+        txtOp = RegistCompent<Text>("Txt_op");
+        txtSecond = RegistCompent<Text>("Txt_second");
+        txtResult = RegistCompent<Text>("Txt_result");
     }
 
     protected void HideOutline()
@@ -323,141 +337,124 @@ public class UILevel : UIPage
         btnPokerBottomRight.gameObject.SetActive(true);
     }
 
-    protected bool CheckFinish()
-    {
-        return true;
-    }
-
     #region 数字点击
     protected void OnClickedNum(Button obj)
     {
-        //一次运算中不能点同一位置的card
-        if (firstNumCard == obj)
-        {
-            return;
-        }
-
         obj.gameObject.GetComponent<Outline>().enabled = true;
-        int operNum = Const.Invalid_Int;
-        switch(obj.name)
+        CalcUnit calcUnit = new CalcUnit();
+        calcUnit.unitType = CalcUnitType.Card;
+        calcUnit.unitData = new UnitData();
+        calcUnit.unitData.btn = obj;
+        switch (obj.name)
         {
             //poker
             case "poker_topleft":
-                operNum = topLeftNum;
-                resultCard = btnResultTopLeft;
+                UnitData.Data(calcUnit.unitData).pointUp = topLeftNum;
+                UnitData.Data(calcUnit.unitData).resultBtn = btnResultTopLeft;
+                GlobalDataManager.GetInstance().cardModel.AddCalcUnit(calcUnit);
                 break;
             case "poker_topright":
-                operNum = topRightNum;
-                resultCard = btnResultTopRight;
+                UnitData.Data(calcUnit.unitData).pointUp = topRightNum;
+                UnitData.Data(calcUnit.unitData).resultBtn = btnResultTopRight;
+                GlobalDataManager.GetInstance().cardModel.AddCalcUnit(calcUnit);
                 break;
             case "poker_bottomleft":
-                operNum = bottomLeftNum;
-                resultCard = btnResultBottomLeft;
+                UnitData.Data(calcUnit.unitData).pointUp = bottomLeftNum;
+                UnitData.Data(calcUnit.unitData).resultBtn = btnResultBottomLeft;
+                GlobalDataManager.GetInstance().cardModel.AddCalcUnit(calcUnit);
                 break;
             case "poker_bottomright":
-                operNum = bottomRightNum;
-                resultCard = btnResultBottomRight;
+                UnitData.Data(calcUnit.unitData).pointUp = bottomRightNum;
+                UnitData.Data(calcUnit.unitData).resultBtn = btnResultBottomRight;
+                GlobalDataManager.GetInstance().cardModel.AddCalcUnit(calcUnit);
                 break;
             //result
             case "result_topleft":
-                operNum = int.Parse(obj.GetComponentInChildren<Text>().text);
-                resultCard = btnResultTopLeft;
+                if (int.TryParse(obj.GetComponentInChildren<Text>().text, out UnitData.Data(calcUnit.unitData).pointUp))
+                {
+                    UnitData.Data(calcUnit.unitData).pointDown = 1;
+                }
+                else
+                {
+                    string[] s = obj.GetComponentInChildren<Text>().text.Split('/');
+                    UnitData.Data(calcUnit.unitData).pointUp = int.Parse(s[0]);
+                    UnitData.Data(calcUnit.unitData).pointDown = int.Parse(s[1]);
+                }
+                UnitData.Data(calcUnit.unitData).resultBtn = btnResultBottomRight;
+                GlobalDataManager.GetInstance().cardModel.AddCalcUnit(calcUnit);
                 break;
             case "result_topright":
-                operNum = int.Parse(obj.GetComponentInChildren<Text>().text);
-                resultCard = btnResultTopRight;
+                if (int.TryParse(obj.GetComponentInChildren<Text>().text, out UnitData.Data(calcUnit.unitData).pointUp))
+                {
+                    UnitData.Data(calcUnit.unitData).pointDown = 1;
+                }
+                else
+                {
+                    string[] s = obj.GetComponentInChildren<Text>().text.Split('/');
+                    UnitData.Data(calcUnit.unitData).pointUp = int.Parse(s[0]);
+                    UnitData.Data(calcUnit.unitData).pointDown = int.Parse(s[1]);
+                }
+                UnitData.Data(calcUnit.unitData).resultBtn = btnResultTopRight;
+                GlobalDataManager.GetInstance().cardModel.AddCalcUnit(calcUnit);
+
                 break;
             case "result_bottomleft":
-                operNum = int.Parse(obj.GetComponentInChildren<Text>().text);
-                resultCard = btnResultBottomLeft;
+                if (int.TryParse(obj.GetComponentInChildren<Text>().text, out UnitData.Data(calcUnit.unitData).pointUp))
+                {
+                    UnitData.Data(calcUnit.unitData).pointDown = 1;
+                }
+                else
+                {
+                    string[] s = obj.GetComponentInChildren<Text>().text.Split('/');
+                    UnitData.Data(calcUnit.unitData).pointUp = int.Parse(s[0]);
+                    UnitData.Data(calcUnit.unitData).pointDown = int.Parse(s[1]);
+                }
+                UnitData.Data(calcUnit.unitData).resultBtn = btnResultTopRight;
+                GlobalDataManager.GetInstance().cardModel.AddCalcUnit(calcUnit);
                 break;
             case "result_bottomright":
-                operNum = int.Parse(obj.GetComponentInChildren<Text>().text);
-                resultCard = btnResultBottomRight;
-                break;
-        }
-
-        bool shouldResult = false;
-        switch (calcOper)
-        {
-            case CalcOper.None:
-                firstNum = operNum;
-                firstNumCard = obj;
-                isSelectedFirstNum = true;
-                break;
-            case CalcOper.Add:
-                firstNum += operNum;
-                shouldResult = true;
-                break;
-            case CalcOper.Sub:
-                firstNum -= operNum;
-                shouldResult = true;
-                break;
-            case CalcOper.Mul:
-                firstNum *= operNum;
-                shouldResult = true;
-                break;
-            case CalcOper.Div:
-                if (operNum == 0)
+                if (int.TryParse(obj.GetComponentInChildren<Text>().text, out UnitData.Data(calcUnit.unitData).pointUp))
                 {
-                    //除0处理
-                    calcOper = CalcOper.None;
-                    firstNumCard.gameObject.GetComponent<Outline>().enabled = false;
-                    obj.gameObject.GetComponent<Outline>().enabled = false;
-                    return;
+                    UnitData.Data(calcUnit.unitData).pointDown = 1;
                 }
-                firstNum /= operNum;
-                shouldResult = true;
+                else
+                {
+                    string[] s = obj.GetComponentInChildren<Text>().text.Split('/');
+                    UnitData.Data(calcUnit.unitData).pointUp = int.Parse(s[0]);
+                    UnitData.Data(calcUnit.unitData).pointDown = int.Parse(s[1]);
+                }
+                UnitData.Data(calcUnit.unitData).resultBtn = btnResultBottomRight;
+                GlobalDataManager.GetInstance().cardModel.AddCalcUnit(calcUnit);
                 break;
         }
-
-        if (shouldResult)
-        {
-            calcOper = CalcOper.None;
-            isSelectedFirstNum = false;
-            firstNumCard.gameObject.SetActive(false);
-            obj.gameObject.SetActive(false);
-            resultCard.gameObject.SetActive(true);
-            resultCard.GetComponentInChildren<Text>().text = firstNum.ToString();
-            --leftCalcStepNum;
-            if (leftCalcStepNum == 0)
-            {
-                if (firstNum == correctResult)
-                {
-                    PageMgr.ShowPage<UIResult>();
-                    return;
-                }
-
-                GenLevel(false);
-            }
-        }
-
     }
     #endregion
 
     #region 运算符+, -, *, / 点击
     protected void OnClickedOp(Button obj)
     {
-        if (!isSelectedFirstNum)
-        {
-            return;
-        }
-
+        CalcUnit calcUnit = new CalcUnit();
+        calcUnit.unitType = CalcUnitType.Oper;
+        calcUnit.unitData = new OperData();
+        calcUnit.unitData.btn = obj;
+        obj.gameObject.GetComponent<Outline>().enabled = true;
         switch (obj.name)
         {
             case "op_add":
-                calcOper = CalcOper.Add;
+                OperData.Data(calcUnit.unitData).op = CalcOper.Add;
                 break;
             case "op_sub":
-                calcOper = CalcOper.Sub;
+                OperData.Data(calcUnit.unitData).op = CalcOper.Sub;
                 break;
             case "op_mul":
-                calcOper = CalcOper.Mul;
+                OperData.Data(calcUnit.unitData).op = CalcOper.Mul;
                 break;
             case "op_div":
-                calcOper = CalcOper.Div;
+                OperData.Data(calcUnit.unitData).op = CalcOper.Div;
                 break;
         }
+
+        GlobalDataManager.GetInstance().cardModel.AddCalcUnit(calcUnit);
     }
     #endregion
 
@@ -501,7 +498,7 @@ public class UILevel : UIPage
         txtLeftTips.text = playerData.leftNumTips.ToString();
         txtTips.text = strTips;
     }
-
+    
     void OnRewardADLoadSuccess(Message msg)
     {
         PageMgr.ClosePage<UIWaitAd>();
@@ -520,6 +517,11 @@ public class UILevel : UIPage
             requestADButUnload = false;
             PromptText.CreatePromptText(false, "Load AD Fail");
         }
+    }
+
+    void OnGenLevel(Message msg)
+    {
+        GenLevel(false);
     }
 
 

@@ -43,12 +43,12 @@ public class UIWaitAd : UIPage {
         {
             voidParamIntCDs.Release();
         }
-        int waitCD = (int)this.m_data;
-        voidParamIntCDs.AddCD(waitCD, null, (CD, _param) =>
-        {
-            HideAndShowText();
-        });
-        voidParamIntCDs.Run();
+        //int waitCD = (int)this.m_data;
+        //voidParamIntCDs.AddCD(waitCD, null, (CD, _param) =>
+        //{
+        //    HideAndShowText();
+        //});
+        //voidParamIntCDs.Run();
     }
 
     public override void Hide()
