@@ -24,7 +24,7 @@ public class UIResult : UIPage
     protected void OnClickedNextLevel(string objName)
     {
         PageMgr.ClosePage(this);
-        var level = PageMgr.GetPage<UILevel>();
+        var level = PageMgr.GetPage<UILevel2>();
         level.GenLevel(true);
     }
 

@@ -138,19 +138,20 @@ public class UILevel2 : UIPage
         InitComponent();
 
         GenLevel(true);
-
+        Debug.LogError(Time.realtimeSinceStartup);
         GlobalDataManager.GetInstance().cardModel.txtFirst = this.txtFirst;
         GlobalDataManager.GetInstance().cardModel.txtOp = this.txtOp;
         GlobalDataManager.GetInstance().cardModel.txtSecond = this.txtSecond;
         GlobalDataManager.GetInstance().cardModel.txtResult = this.txtResult;
+        Debug.LogError(Time.realtimeSinceStartup);
 
         MessageManager.GetInstance().Regist((int)GameMessageDefine.GenLevel, OnGenLevel);
 
         MessageManager.GetInstance().Regist((int)GameMessageDefine.RewardADLoadSuccess, OnRewardADLoadSuccess);
 
         MessageManager.GetInstance().Regist((int)GameMessageDefine.RewardADLoadFail, OnRewardADLoadFail);
+        Debug.LogError(Time.realtimeSinceStartup);
 
-        
     }
 
     public override void Tick(int deltaTimeMS)
@@ -166,6 +167,17 @@ public class UILevel2 : UIPage
     public void GenLevel(bool isNewLevel)
     {
         txtTips.text = "";
+
+        txtFirst.text = "";
+        txtOp.text = "";
+        txtSecond.text = "";
+        txtResult.text = "";
+
+        GlobalDataManager.GetInstance().cardModel.leftCalcStepNum = 3;
+        GlobalDataManager.GetInstance().cardModel.first = null;
+        GlobalDataManager.GetInstance().cardModel.second = null;
+        GlobalDataManager.GetInstance().cardModel.op = null;
+        GlobalDataManager.GetInstance().cardModel.resultBtn = null;
 
         //所有的outline隐藏
         HideOutline();
@@ -380,7 +392,7 @@ public class UILevel2 : UIPage
                     UnitData.Data(calcUnit.unitData).pointUp = int.Parse(s[0]);
                     UnitData.Data(calcUnit.unitData).pointDown = int.Parse(s[1]);
                 }
-                UnitData.Data(calcUnit.unitData).resultBtn = btnResultBottomRight;
+                UnitData.Data(calcUnit.unitData).resultBtn = btnResultTopLeft;
                 GlobalDataManager.GetInstance().cardModel.AddCalcUnit(calcUnit);
                 break;
             case "result_topright":
@@ -409,7 +421,7 @@ public class UILevel2 : UIPage
                     UnitData.Data(calcUnit.unitData).pointUp = int.Parse(s[0]);
                     UnitData.Data(calcUnit.unitData).pointDown = int.Parse(s[1]);
                 }
-                UnitData.Data(calcUnit.unitData).resultBtn = btnResultTopRight;
+                UnitData.Data(calcUnit.unitData).resultBtn = btnResultBottomLeft;
                 GlobalDataManager.GetInstance().cardModel.AddCalcUnit(calcUnit);
                 break;
             case "result_bottomright":
@@ -480,6 +492,10 @@ public class UILevel2 : UIPage
 
     protected void OnClickTips(Button obj)
     {
+#if UNITY_EDITOR
+        OnTipsWatchRewardAdSuccessed();
+        return;
+#endif
         if (AdmobManager.GetInstance().isLoaded)
         {
             requestADButUnload = false;
