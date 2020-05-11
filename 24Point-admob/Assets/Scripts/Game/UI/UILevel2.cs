@@ -492,10 +492,18 @@ public class UILevel2 : UIPage
 
     protected void OnClickTips(Button obj)
     {
-#if UNITY_EDITOR
-        OnTipsWatchRewardAdSuccessed();
+//#if UNITY_EDITOR
+//        OnTipsWatchRewardAdSuccessed();
+//        return;
+//#endif
+        if (playerData.leftNumTips > 0)
+        {
+            --playerData.leftNumTips;
+            txtLeftTips.text = playerData.leftNumTips.ToString();
+            OnTipsWatchRewardAdSuccessed();
+        }
+
         return;
-#endif
         if (AdmobManager.GetInstance().isLoaded)
         {
             requestADButUnload = false;
@@ -510,7 +518,7 @@ public class UILevel2 : UIPage
 
     void OnTipsWatchRewardAdSuccessed()
     {
-        ++playerData.leftNumTips;
+        //++playerData.leftNumTips;
         txtLeftTips.text = playerData.leftNumTips.ToString();
         txtTips.text = strTips;
     }
