@@ -126,7 +126,7 @@ public class UILevel2 : UIPage
     /// </summary>
     bool requestADButUnload = false;
 
-    public UILevel2() : base(UIType.PopUp, UIMode.DoNothing, UICollider.None, UITickedMode.Update)
+    public UILevel2() : base(UIType.Fixed, UIMode.DoNothing, UICollider.None, UITickedMode.Update)
     {
         uiPath = "UIPrefab/UILevel";
     }
