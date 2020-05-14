@@ -11,7 +11,6 @@ namespace Game
     public interface ICalcUnitData
     {
         Button btn { get; set; }
-        //UIPOS uiPos { get; set; }
     }
 
     public class UnitData : ICalcUnitData
@@ -32,19 +31,6 @@ namespace Game
         /// </summary>
         public Button resultBtn;
 
-        //public UIPOS uiPos
-        //{
-        //    get
-        //    {
-        //        throw new NotImplementedException();
-        //    }
-
-        //    set
-        //    {
-        //        throw new NotImplementedException();
-        //    }
-        //}
-
         public Button btn { get; set; }
 
         public static UnitData Data(ICalcUnitData i)
@@ -57,19 +43,6 @@ namespace Game
     public class OperData : ICalcUnitData
     {
         public CalcOper op;
-
-        //UIPOS ICalcUnitData.uiPos
-        //{
-        //    get
-        //    {
-        //        throw new NotImplementedException();
-        //    }
-
-        //    set
-        //    {
-        //        throw new NotImplementedException();
-        //    }
-        //}
 
         public Button btn { get; set; }
 
@@ -87,8 +60,6 @@ namespace Game
 
     public class CardModel
     {
-        //Queue<CalcUnit> calcUnits = new Queue<CalcUnit>();
-
         public int leftCalcStepNum = 3;
         public CalcUnit first;
         public CalcUnit second;
@@ -119,8 +90,6 @@ namespace Game
                     {
                         if (second != null && second.unitData.btn == calcUnit.unitData.btn)
                         {
-                            //first.unitData.btn.GetComponent<Outline>().enabled = false;
-                            //first = null;
                             txtFirst.text = "";
 
                             second.unitData.btn.GetComponent<Outline>().enabled = false;
@@ -227,7 +196,8 @@ namespace Game
             UnitData.Data(first.unitData).btn.gameObject.SetActive(false);
             UnitData.Data(second.unitData).btn.gameObject.SetActive(false);
             resultBtn.gameObject.SetActive(true);
-            if (UnitData.Data(calcUnit.unitData).pointDown != 1)
+			resultBtn.GetComponent<Outline>().enabled = false;
+			if (UnitData.Data(calcUnit.unitData).pointDown != 1)
             {
                 resultBtn.GetComponentInChildren<Text>().text = UnitData.Data(calcUnit.unitData).pointUp + "/" + UnitData.Data(calcUnit.unitData).pointDown;
                 txtResult.text = UnitData.Data(calcUnit.unitData).pointUp + "/" + UnitData.Data(calcUnit.unitData).pointDown;
@@ -238,9 +208,6 @@ namespace Game
                 txtResult.text = UnitData.Data(calcUnit.unitData).pointUp.ToString();
             }
 
-            //resultBtn.GetComponent<Outline>().enabled = true;
-            //first = calcUnit;
-            //resultBtn = UnitData.Data(first.unitData).resultBtn;
             op.unitData.btn.GetComponent<Outline>().enabled = false;
             first = null;
             resultBtn = null;

@@ -7,6 +7,7 @@ using UFrame.MessageCenter;
 using UFrame.MiniGame;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class UILevel2 : UIPage
 {
@@ -76,27 +77,7 @@ public class UILevel2 : UIPage
     Text txtLeftNext = null;
 
     string strTips = ""; 
-
-    /// <summary>
-    /// 运算中第一个数
-    /// </summary>
-    //int firstNum = Const.Invalid_Int;
-
-    /// <summary>
-    /// 运算符
-    /// </summary>
-    //CalcOper calcOper = CalcOper.None;
-
-    /// <summary>
-    /// 运算中第二个数
-    /// </summary>
-    //int SecondNum = Const.Invalid_Int;
-
-    ///// <summary>
-    ///// 是否选定第一个数
-    ///// </summary>
-    //bool isSelectedFirstNum = false;
-
+	
     int topLeftNum = Const.Invalid_Int;
     int topRightNum = Const.Invalid_Int;
     int bottomLeftNum = Const.Invalid_Int;
@@ -152,7 +133,9 @@ public class UILevel2 : UIPage
         MessageManager.GetInstance().Regist((int)GameMessageDefine.RewardADLoadFail, OnRewardADLoadFail);
         Debug.LogError(Time.realtimeSinceStartup);
 
-    }
+		transform.Find("tips").DOScale(1.2f, 0.2f).SetLoops(-1, LoopType.Yoyo);
+
+	}
 
     public override void Tick(int deltaTimeMS)
     {
@@ -318,7 +301,10 @@ public class UILevel2 : UIPage
         txtOp = RegistCompent<Text>("Txt_op");
         txtSecond = RegistCompent<Text>("Txt_second");
         txtResult = RegistCompent<Text>("Txt_result");
-    }
+
+		RegistBtnAndClick("head/btn_IAP", OnClickedIAP);
+		RegistBtnAndClick("head/btn_AD", OnClickedAD);
+	}
 
     protected void HideOutline()
     {
@@ -468,9 +454,25 @@ public class UILevel2 : UIPage
 
         GlobalDataManager.GetInstance().cardModel.AddCalcUnit(calcUnit);
     }
-    #endregion
+	#endregion
 
-    protected void OnClickRestart(Button obj)
+	protected void OnClickedIAP(Button obj)
+	{
+		UFrameIAP.GetInstance().BuyConsumable();
+	}
+
+	protected void OnClickedAD(Button obj)
+	{
+		if (AdmobManager.GetInstance().isLoaded) {
+			requestADButUnload = false;
+			AdmobManager.GetInstance().UserChoseToWatchAd(OnTipsWatchRewardAdSuccessed);
+		} else {
+			requestADButUnload = true;
+			PageMgr.ShowPage<UIWaitAd>(5000);
+		}
+	}
+
+	protected void OnClickRestart(Button obj)
     {
         if (playerData.leftNumResetPoker > 0)
         {

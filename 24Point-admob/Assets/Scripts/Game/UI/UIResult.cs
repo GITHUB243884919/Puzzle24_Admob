@@ -1,9 +1,5 @@
-﻿using Game.MessageCenter;
-using UFrame;
-using UnityEngine;
+﻿using UnityEngine;
 using DG.Tweening;
-using DG.Tweening.Plugins.Options;
-using DG.Tweening.Core;
 
 public class UIResult : UIPage
 {
