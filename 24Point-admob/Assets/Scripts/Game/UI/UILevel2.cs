@@ -317,7 +317,12 @@ public class UILevel2 : UIPage
         olResultTopRight.enabled = false;
         olResultBottomLeft.enabled = false;
         olResultBottimRight.enabled = false;
-    }
+
+		GameObject.Find(Oper_Add_Path).GetComponent<Outline>().enabled = false;
+		GameObject.Find(Oper_Sub_Path).GetComponent<Outline>().enabled = false;
+		GameObject.Find(Oper_Mul_Path).GetComponent<Outline>().enabled = false;
+		GameObject.Find(Oper_Div_Path).GetComponent<Outline>().enabled = false;
+	}
 
     protected void HideResult()
     {
