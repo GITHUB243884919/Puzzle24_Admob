@@ -338,6 +338,7 @@ public class UILevel2 : UIPage
         btnPokerTopRight.gameObject.SetActive(true);
         btnPokerBottomLeft.gameObject.SetActive(true);
         btnPokerBottomRight.gameObject.SetActive(true);
+		transform.Find("guide").gameObject.SetActive(true);
     }
 
     #region 数字点击
@@ -528,7 +529,8 @@ public class UILevel2 : UIPage
         //++playerData.leftNumTips;
         txtLeftTips.text = playerData.leftNumTips.ToString();
         txtTips.text = strTips;
-    }
+		transform.Find("guide").gameObject.SetActive(false);
+	}
     
     void OnRewardADLoadSuccess(Message msg)
     {
